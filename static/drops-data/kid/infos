@@ -9,6 +9,7 @@
     "type": "album",
     "blockchain": "ETH",
     "token": "123",
+	"contract" : "0x73506493b72E6E2AF18Bd3Af5c76E2D165F7aFcB",
     "medias": {
         "cover": "kid-cudi-man-on-the-moon-3-teaser_1290_758-1.jpg",
         "video": {
@@ -32,7 +33,8 @@
             "price": "99",
             "percent": "0.005",
             "image": "Slyce-Favicons-3.png",
-            "id": "Int256",
+            "id": "0",
+			"availableAmount" : "999",
             "benefits": [
                 "Private community access",
                 "Exclusivity on next release"
@@ -44,7 +46,8 @@
             "price": "499",
             "percent": "0.050",
             "image": "Slyce-Favicons-1-1.png",
-            "id": "Int256",
+            "id": "1",
+			"availableAmount" : "99",
             "benefits": [
                 "Private community access",
                 "Exclusivity on next release",
@@ -53,11 +56,12 @@
         },
         {
             "type": "Diamond",
-            "tokens": "100",
+            "tokens": "10",
             "price": "999",
             "percent": "0.500",
             "image": "Slyce-Favicons-2-1.png",
-            "id": "Int256",
+            "id": "2",
+			"availableAmount" : "9",
             "benefits": [
                 "Private community access",
                 "Exclusivity on next release",

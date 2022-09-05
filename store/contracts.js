@@ -25,6 +25,7 @@ const state = function() {
       tierAvailable: [null],
       amountTier: [null]
     }],
+    slyceDropLogicTier: [],
   }
 };
 
@@ -41,6 +42,9 @@ const getters = {
   },
   getSlyceDropLogicList(state) {
     return state.slyceDropLogicList;
+  },
+  getSlyceDropLogicTier(state) {
+    return state.slyceDropLogicTier;
   },
 
   //DropBuy
@@ -75,86 +79,6 @@ const actions = {
 
     let contract = new ethers.Contract(slyceDropLogicAddress, SlyceDropLogic.abi, provider);
     commit("setSlyceDropLogicContract", contract);
-  },
-
-  async storeSlyceDropLogicList({commit, rootState}) {
-    let slyceDropLogicList = [];
-
-    let provider = rootState.accounts.providerEthers;
-    let tokenContract;
-
-    let dropCreatedEventFilter = state.slyceDropLogicContract.filters.DropCreated();
-    let dropCreatedEvents = await state.slyceDropLogicContract.queryFilter(dropCreatedEventFilter);
-
-    let dropMintedEventFilter = state.slyceDropLogicContract.filters.DropMinted();
-    let dropMintedEvents = await state.slyceDropLogicContract.queryFilter(dropMintedEventFilter);
-
-    let dropMintedEvent = null;
-
-    console.log("DropCreated : " + dropCreatedEvents.length);
-    
-    for (const [id,event] of dropCreatedEvents.entries()) {
-      //Address
-      var artistAdr = event.args.artistAdr;
-      //Address
-      var dropContract = event.args.dropAddress;
-
-      tokenContract = new ethers.Contract(dropContract, SlyceToken.abi, provider);
-      var dropMetadata = await tokenContract.contractURI();
-
-      for(var i=0;i<dropMintedEvents.length;i++){
-        if(dropMintedEvents[i].args.dropAddress == dropContract){
-          console.log("DropMinted ("+dropContract+") : " + dropMintedEvents.length);
-          dropMintedEvent = dropMintedEvents[i];
-          break;
-        }else{
-          
-          dropMintedEvent = null;
-        }
-      }
-      if(dropMintedEvent == null) {
-        console.log("No DropMinted for "+dropContract);
-      }
-      
-      
-      //uint256[]
-      var amountTier = [];
-      //uint256[] -> base16
-      var slyceId = [];
-      var amountTierPassed = 0;
-      //uint256[]
-      var tierAvailable = [];
-      var tokenMetadata = [];
-      var tierAvailableCb;
-      for(i=0;i<event.args.amountTierToSold.length;i++){
-        amountTier.push(event.args.amountTierToSold[i].toString());
-        tierAvailableCb = 0;
-
-        if(dropMintedEvent != null){
-          if(dropMintedEvent.args.slyceId.length > amountTierPassed+amountTier[i]) {
-            slyceId.push(dropMintedEvent.args.slyceId[amountTierPassed].toHexString());
-            tokenMetadata.push(await tokenContract.uri(dropMintedEvent.args.slyceId[amountTierPassed].toHexString()));
-            var isPurchasableArray = await state.slyceDropBuyContract.areSlycesPurchasable(dropContract, dropMintedEvent.args.slyceId.slice(amountTierPassed, amountTierPassed+amountTier[i]));
-            for(var k=0; k<isPurchasableArray.length; k++){
-              tierAvailableCb += isPurchasableArray[k] ? 1 : 0;
-            }
-          }else if(dropMintedEvent.args.slyceId.length > amountTierPassed){
-            slyceId.push(dropMintedEvent.args.slyceId[amountTierPassed].toHexString());
-            tokenMetadata.push(await tokenContract.uri(dropMintedEvent.args.slyceId[amountTierPassed].toHexString()));
-            for(var j=0;j<amountTier[i];j++){
-              if(dropMintedEvent.args.slyceId.length > (amountTierPassed+j)){
-                tierAvailableCb += await state.slyceDropBuyContract.isSlycePurchasable(dropContract, dropMintedEvent.args.slyceId[amountTierPassed+j].toString()) ?  1 : 0;
-              }
-            }
-          }
-        }
-
-        tierAvailable.push(tierAvailableCb);
-        amountTierPassed += parseInt(amountTier[i]);
-      }
-      slyceDropLogicList.push({id: id, artistAdr: artistAdr, dropContract: dropContract, slyceId: slyceId, dropMetadata: dropMetadata, tokenMetadata: tokenMetadata, amountTier: amountTier, tierAvailable: tierAvailable});
-    }
-    commit("setSlyceDropLogicList", slyceDropLogicList);
   },
 
   storeSlyceDropLogicAbi({commit}) {
@@ -204,6 +128,87 @@ const actions = {
 
     commit("setSlyceRoyaltiesAddress", slyceRoyaltiesAddress);
   },
+
+  // LOGIC
+  async storeSlyceDropLogicList({commit, rootState, getters}) {
+    let slyceDropLogicList = [];
+
+    let provider = rootState.accounts.providerEthers;
+    let tokenContract;
+
+    let dropCreatedEventFilter = getters.getSlyceDropLogicContract.filters.DropCreated();
+    let dropCreatedEvents = await getters.getSlyceDropLogicContract.queryFilter(dropCreatedEventFilter);
+
+    let dropMintedEventFilter = getters.getSlyceDropLogicContract.filters.DropMinted();
+    let dropMintedEvents = await getters.getSlyceDropLogicContract.queryFilter(dropMintedEventFilter);
+
+    let dropMintedEvent = null;
+
+    console.log("DropCreated : " + dropCreatedEvents.length);
+    
+    for (const [id,event] of dropCreatedEvents.entries()) {
+      //Address
+      var artistAdr = event.args.artistAdr;
+      //Address
+      var dropContract = event.args.dropAddress;
+
+      tokenContract = new ethers.Contract(dropContract, SlyceToken.abi, provider);
+      var dropMetadata = await tokenContract.contractURI();
+
+      for(var i=0;i<dropMintedEvents.length;i++){
+        if(dropMintedEvents[i].args.dropAddress == dropContract){
+          console.log("DropMinted ("+dropContract+") : " + dropMintedEvents.length);
+          dropMintedEvent = dropMintedEvents[i];
+          break;
+        }else{
+          
+          dropMintedEvent = null;
+        }
+      }
+      if(dropMintedEvent == null) {
+        console.log("No DropMinted for "+dropContract);
+      }
+      
+      
+      //uint256[]
+      var amountTier = [];
+      //uint256[] -> base16
+      var slyceId = [];
+      var amountTierPassed = 0;
+      //uint256[]
+      var tierAvailable = [];
+      var tokenMetadata = [];
+      var tierAvailableCb;
+      for(i=0;i<event.args.amountTierToSold.length;i++){
+        amountTier.push(event.args.amountTierToSold[i].toString());
+        tierAvailableCb = 0;
+
+        if(dropMintedEvent != null){
+          if(dropMintedEvent.args.slyceId.length > amountTierPassed+amountTier[i]) {
+            slyceId.push(dropMintedEvent.args.slyceId[amountTierPassed].toHexString());
+            tokenMetadata.push(await tokenContract.uri(dropMintedEvent.args.slyceId[amountTierPassed].toHexString()));
+            var isPurchasableArray = await getters.getSlyceDropBuyContract.areSlycesPurchasable(dropContract, dropMintedEvent.args.slyceId.slice(amountTierPassed, amountTierPassed+amountTier[i]));
+            for(var k=0; k<isPurchasableArray.length; k++){
+              tierAvailableCb += isPurchasableArray[k] ? 1 : 0;
+            }
+          }else if(dropMintedEvent.args.slyceId.length > amountTierPassed){
+            slyceId.push(dropMintedEvent.args.slyceId[amountTierPassed].toHexString());
+            tokenMetadata.push(await tokenContract.uri(dropMintedEvent.args.slyceId[amountTierPassed].toHexString()));
+            for(var j=0;j<amountTier[i];j++){
+              if(dropMintedEvent.args.slyceId.length > (amountTierPassed+j)){
+                tierAvailableCb += await getters.getSlyceDropBuyContract.isSlycePurchasable(dropContract, dropMintedEvent.args.slyceId[amountTierPassed+j].toString()) ?  1 : 0;
+              }
+            }
+          }
+        }
+
+        tierAvailable.push(tierAvailableCb);
+        amountTierPassed += parseInt(amountTier[i]);
+      }
+      slyceDropLogicList.push({id: id, artistAdr: artistAdr, dropContract: dropContract, slyceId: slyceId, dropMetadata: dropMetadata, tokenMetadata: tokenMetadata, amountTier: amountTier, tierAvailable: tierAvailable});
+    }
+    commit("setSlyceDropLogicList", slyceDropLogicList);
+  },
   
 };
 
@@ -212,14 +217,17 @@ const mutations = {
   setSlyceDropLogicContract(state, contract) {
     state.slyceDropLogicContract = contract;
   },
-  setSlyceDropLogicList(state, slyceDropLogicList) {
-    state.slyceDropLogicList = slyceDropLogicList;
-  },
   setSlyceDropLogicAbi(state, abi) {
     state.slyceDropLogicAbi = abi;
   },
   setSlyceDropLogicAddress(state, address) {
     state.slyceDropLogicAddress = address;
+  },
+  setSlyceDropLogicList(state, slyceDropLogicList) {
+    state.slyceDropLogicList = slyceDropLogicList;
+  },
+  setSlyceDropLogicTier(state, slyceDropLogicTier) {
+    state.slyceDropLogicTier = slyceDropLogicTier;
   },
 
   // SlyceDropBuy

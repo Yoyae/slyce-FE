@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import accounts from "@/store/modules/accounts";
-import contracts from "@/store/modules/contracts";
+import accounts from "@/store/accounts";
+import contracts from "@/store/contracts";
 
 Vue.use(Vuex);
 

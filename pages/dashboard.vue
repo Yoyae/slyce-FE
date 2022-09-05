@@ -61,10 +61,9 @@ export default {
   async created() {
     // if web3 provider has not been yet loaded, redirect to root 
     if (!this.getProviderEthers) {
-      // document.location.href="/";
+      document.location.href="/";
       return;
     } else {
-      return;
       this.$store.dispatch("contracts/storeSlyceDropLogicAbi");
       this.$store.dispatch("contracts/storeSlyceDropLogicAddress");
       // get the contract instance

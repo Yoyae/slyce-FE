@@ -48,7 +48,7 @@ const getters = {
 
 const actions = {
 
-  async initWeb3Modal({ commit }) {
+  async initWeb3Modal({ commit, getters }) {
     const providerOptions = {
       // MetaMask is enabled by default
       // Find other providers here: https://github.com/Web3Modal/web3modal/tree/master/docs/providers
@@ -75,21 +75,21 @@ const actions = {
       commit("setActiveAccount", window.ethereum.selectedAddress);
       commit("setChainData", window.ethereum.chainId);
       commit("setEthersProvider", providerW3m); // BUG: problème au niveau de la mutation de l'objet passé en paramètre
-      actions.fetchActiveBalance({ commit });
+      actions.fetchActiveBalance({ commit, getters });
     }
 
-    commit("setWeb3ModalInstance", w3mObject);
+    commit("setWeb3Modal", w3mObject);
   },
 
   async connectWeb3Modal({ commit, getters }) {
-    // let providerW3m = await state.web3Modal.connect();
-    let providerW3m = await getters.getWeb3Modal().connect();
+    //let providerW3m = await state.web3Modal.connect();
+    let providerW3m = await getters.getWeb3Modal.connect();
     commit("setIsConnected", true);
 
     commit("setActiveAccount", window.ethereum.selectedAddress);
     commit("setChainData", window.ethereum.chainId);
     commit("setEthersProvider", providerW3m);
-    actions.fetchActiveBalance({ commit });
+    actions.fetchActiveBalance({ commit, getters });
   },
 
   async disconnectWeb3Modal({ commit }) {
@@ -102,21 +102,21 @@ const actions = {
     window.ethereum.on('accountsChanged', (accounts) => {
       if (getters.isUserConnected()) {
         commit("setActiveAccount", accounts[0]);
-        commit("setEthersProvider", getters.getProviderW3m());
-        actions.fetchActiveBalance({ commit });
+        commit("setEthersProvider", getters.getProviderW3m);
+        actions.fetchActiveBalance({ commit, getters });
       }
     });
 
     window.ethereum.on('chainChanged', (chainId) => {
       commit("setChainData", chainId);
-      commit("setEthersProvider", getters.getProviderW3m());
-      actions.fetchActiveBalance({ commit });
+      commit("setEthersProvider", getters.getProviderW3m);
+      actions.fetchActiveBalance({ commit, getters });
     });
 
   },
 
-  async fetchActiveBalance({ commit, state }) {
-    let balance = await state.providerEthers.getBalance(state.activeAccount);
+  async fetchActiveBalance({ commit, getters }) {
+    let balance = await getters.getProviderEthers.getBalance(getters.getActiveAccount);
     commit("setActiveBalance", balance);
   }
   
@@ -187,7 +187,7 @@ const mutations = {
     localStorage.setItem('isConnected', isConnected);
   },
 
-  setWeb3ModalInstance(state, w3mObject) {
+  setWeb3Modal(state, w3mObject) {
     state.web3Modal = w3mObject;
   }
 

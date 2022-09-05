@@ -11,6 +11,18 @@
 			
 			<!-- Blocs -->
 			<div class="flex-1">
+				<ul class="navbar-nav mr-auto px-3">
+					<li class="nav-item text-nowrap" v-if="!isUserConnected">
+						<button class="btn btn-outline-primary" type="button" @click="connectWeb3Modal">Connect your wallet</button>
+						
+					</li>
+					<li class="nav-item text-nowrap" v-if="isUserConnected">
+						<span class="navbar-text">
+						{{getActiveAccount}}
+						</span>
+						<button class="btn btn-outline-danger" type="button"  @click="disconnectWeb3Modal">Disconnect</button>
+					</li>
+				</ul>
 				
 				<div class="card-blur">
 					<h1 class="title title--overlay">{{ config.name }}</h1>
@@ -320,6 +332,10 @@
 
 <script>
 import Popup from '@/components/popup.vue';
+import { ethers } from "ethers";
+import { mapGetters, mapActions } from "vuex";
+import { urlToHttpOptions } from 'url';
+import { runInThisContext } from 'vm';
 
 export default {
 	layout: 'drop',
@@ -331,6 +347,8 @@ export default {
             dropToken: null,
             dropUrl: null,
             config: null,
+
+			tiers: [],
 
 			selectedTier: null,
 
@@ -344,7 +362,9 @@ export default {
         }
     },
     computed: {
-        coverStyle() {
+		...mapGetters("accounts", ["getActiveAccount", "getProviderEthers", "isUserConnected", "getWeb3Modal"]),
+		...mapGetters("contracts", ["getSlyceDropLogicContract", "getSlyceDropLogicAbi", "getSlyceDropLogicAddress", "getSlyceDropLogicTier", "getSlyceDropBuyContract", "getSlyceDropBuyAbi", "getSlyceDropBuyAddress"]),
+		coverStyle() {
             if(!this.config)
                 return {};
 
@@ -432,8 +452,34 @@ export default {
         this.setPageTitle(config.name);
 
         this.config = config;
+
+		//Web3
+		await this.$store.dispatch("accounts/initWeb3Modal",);
+    	await this.$store.dispatch("accounts/ethereumListener");
+
+		if (!this.getProviderEthers) {
+			for(const [id, tier] of this.config.tiers.entries()){
+				this.tiers.push(tier.availableAmount);
+			}
+		} else {
+			this.$store.dispatch("contracts/storeSlyceDropLogicAbi");
+			this.$store.dispatch("contracts/storeSlyceDropLogicAddress");
+			this.$store.dispatch("contracts/storeSlyceDropLogicContract");
+			this.$store.dispatch("contracts/storeSlyceDropBuyAbi");
+			this.$store.dispatch("contracts/storeSlyceDropBuyAddress");
+			this.$store.dispatch("contracts/storeSlyceDropBuyContract");
+			let signer = this.getProviderEthers.getSigner(); 
+			let logicContract = new ethers.Contract(this.getSlyceDropLogicAddress, this.getSlyceDropLogicAbi, signer);
+			let result = await logicContract.getDropStatus(this.config.contract);
+
+			for(const [id, tier] of result[1].entries()){
+				this.tiers.push(tier);
+			}
+		}
+
     },
     methods: {
+		...mapActions("accounts", ["connectWeb3Modal", "disconnectWeb3Modal"]),
         watchScoll() {
             // Quand la cover sort du champ, afficher le header
         },
@@ -447,9 +493,8 @@ export default {
             return `${this.dropUrl + url}`;
         },
         getTokenLeft(tier) {
-            // FRANCOIS : Récupèrer l'information via la blockchain (peut être de manière global à l'initialisation)
             if(tier)
-                return 1;
+				return this.tiers[tier.id];
             else
                 return 0;
         },
@@ -463,17 +508,30 @@ export default {
 			this.selectedTier = null;
 			this.showConfirmationPopup = false;
 		},
-		confirm() {
+		async confirm() {
 			this.showConfirmationPopup = false;
 			this.showTransactionPopup = true;
 
-			// FRANCOIS : Action BlockChain
-		
-			let _this = this;
-			setTimeout(() => {
-				this.showTransactionPopup = false;
-				this.alertSuccess = "Congratulation ! You're Slyce is now in you wallet.";
-			}, 3000)
+			if (!this.getProviderEthers) {
+				setTimeout(() => {
+					this.showTransactionPopup = false;
+					this.alertWarning = "No wallet connected";
+				}, 500)
+			} else {
+				let buyContract = new ethers.Contract(this.getSlyceDropBuyAddress, this.getSlyceDropBuyAbi, this.getProviderEthers.getSigner());
+
+				//HUGO -> Rempalcer tierIdToPurshase et numberOfTierToPurshase par les bonnes variables.
+				// tierIdToPurshase -> l'ID du tier qu'il achète (ex : GOLD : 0)
+				// numberOfTierToPurshase -> le montant qu'il achète (ça doit être un champ nombre présent juste avant le "Confirm")
+				let purshaseResult = await buyContract.purchaseDrop(this.config.contract, tierIdToPurshase, numberOfTierToPurshase);
+				//purshaseResult contient le tx si la transaction a été envoyé, sinon le message d'erreur
+
+				setTimeout(() => {
+					this.showTransactionPopup = false;
+					this.alertSuccess = "Congratulation ! You're Slyce is now in you wallet.";
+				}, 3000)
+			}
+
 		}
     }
 }
