@@ -1,0 +1,70 @@
+{
+    "name": "Man on The Moon III",
+    "description": "Cudi (aka Scott Mescudi) made his third moon landing at midnight on Friday, December 11, ten years after his last outer space excursion. Not many albums can live up to a decade of hype, but somehow across 18 tracks with help from the Phoebe Bridgers, Skepta, and the late Pop Smoke, Cudi surpasses those expectations. It’s an extremely difficult task to create an album that’s excellent and unforgettable. Trying to carry that magic over to multiple albums, all connected in one continuous series, is an even more monumental task. However, when done right, album series offer fans years of enjoyment.",
+    "releaseDate": "2022-09-01 19:00",
+    "artist": {
+        "name": "Kid Kudi",
+        "thumbnail": "53268-kid-cudi.jpg"
+    },
+    "type": "album",
+    "blockchain": "ETH",
+    "token": "123",
+    "medias": {
+        "cover": "kid-cudi-man-on-the-moon-3-teaser_1290_758-1.jpg",
+        "video": {
+            "url": "https://www.youtube.com/embed/lZcRSy0sk5w?feature=oembed&autoplay=1",
+            "thumbnail": "Kid-cudi-album-1.jpeg"
+        },
+        "spotify": {}
+    },
+    "social": {
+        "instagram": "https://instagram.com/",
+        "facebook": "https://facebook.com/",
+        "twitter": "https://twitter.com/",
+        "spotify": "https://spotify.com/",
+        "youtube": "https://youtube.com/",
+        "applemusic": "https://apple.com/"
+    },
+    "tiers": [
+        {
+            "type": "Gold",
+            "tokens": "1000",
+            "price": "99",
+            "percent": "0.005",
+            "image": "Slyce-Favicons-3.png",
+            "id": "Int256",
+            "benefits": [
+                "Private community access",
+                "Exclusivity on next release"
+            ]
+        },
+        {
+            "type": "Platinium",
+            "tokens": "100",
+            "price": "499",
+            "percent": "0.050",
+            "image": "Slyce-Favicons-1-1.png",
+            "id": "Int256",
+            "benefits": [
+                "Private community access",
+                "Exclusivity on next release",
+                "Signed vinyl"
+            ]
+        },
+        {
+            "type": "Diamond",
+            "tokens": "100",
+            "price": "999",
+            "percent": "0.500",
+            "image": "Slyce-Favicons-2-1.png",
+            "id": "Int256",
+            "benefits": [
+                "Private community access",
+                "Exclusivity on next release",
+                "Signed vinyl",
+                "VIP pass for next year tour"
+            ]
+        }
+    ],
+    "style": {}
+}
