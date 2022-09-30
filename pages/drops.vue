@@ -462,7 +462,9 @@ export default {
         }
     },
     async created() {
-        this.dropToken = this.$route?.params?.token;
+        // this.dropToken = this.$route?.params?.token;
+		let URLParams = new URLSearchParams(window.location.search);
+		this.dropToken = URLParams.get('ref');
 
         if(!this.dropToken)
             return this.redirectHomepage();
