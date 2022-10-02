@@ -7,6 +7,7 @@
     <table class="table table-striped table-bordered table-hover table-responsive" >
         <thead>
             <tr>
+                <th>State</th>               
                 <th>Address de l'artiste</th>
                 <th>Address/Metadata du drop</th>
                 <th>Starting slyceId (par tier)</th>
@@ -17,6 +18,7 @@
         </thead>
         <tbody>
           <tr v-for="drop in drops" :key="drop.id">
+            <td>{{drop.status}}</td>
             <td>{{drop.artistAdr}}</td>
             <td>{{drop.dropContract}}
                 <br>
@@ -80,44 +82,26 @@ export default {
       await this.$store.dispatch("contracts/storeSlyceDropLogicList");
 
       for (const [id,drop] of this.getSlyceDropLogicList.entries()) {
-        this.$set(this.drops, id,  {artistAdr: drop.artistAdr, dropContract: drop.dropContract, dropMetadata:drop.dropMetadata, slyceId: drop.slyceId, tokenMetadata:drop.tokenMetadata, tierAvailable: drop.tierAvailable, amountTier: drop.amountTier});
-      }
-
-      // set event listener
-      this.getSlyceDropLogicContract.on("DropCreated", async () => {
-        // show a toast
-        this.$toasted.show('New drop created ', {
-          type: 'success',
-          duration: 5000,
-          theme: "bubble",
-          position: "bottom-right"
-        });
-    
-      
-        // refresh list in contracts.js and display
-        await this.$store.dispatch("contracts/storeSlyceDropLogicList");
-
-        for (const [id,drop] of this.getSlyceDropLogicList.entries()) {
-          this.$set(this.drops, id,  {artistAdr: drop.artistAdr, dropContract: drop.dropContract, dropMetadata:drop.dropMetadata, slyceId: drop.slyceId, tokenMetadata:drop.tokenMetadata, tierAvailable: drop.tierAvailable, amountTier: drop.amountTier});
+        let status = (await this.contract.getDropStatus(drop.dropContract))[5];
+        let statusText = "";
+        switch(status){
+          case 1:
+            statusText = "MINT";
+            break;
+          case 2: 
+            statusText = "WAIT";
+            break;
+          case 3:
+            statusText = "BUY";
+            break;
+          dafault:
+            statusText = "ERROR";
+            break;
         }
-      });
-      this.getSlyceDropLogicContract.on("DropMinted", async () => {
-        // show a toast
-        this.$toasted.show('New drop minted ', {
-          type: 'success',
-          duration: 5000,
-          theme: "bubble",
-          position: "bottom-right"
-        });
-    
-      
-        // refresh list in contracts.js and display
-        await this.$store.dispatch("contracts/storeSlyceDropLogicList");
 
-        for (const [id,drop] of this.getSlyceDropLogicList.entries()) {
-          this.$set(this.drops, id,  {artistAdr: drop.artistAdr, dropContract: drop.dropContract, dropMetadata:drop.dropMetadata, slyceId: drop.slyceId, tokenMetadata:drop.tokenMetadata, tierAvailable: drop.tierAvailable, amountTier: drop.amountTier});
-        }      
-      })
+        this.$set(this.drops, id,  {status: statusText, artistAdr: drop.artistAdr, dropContract: drop.dropContract, dropMetadata:drop.dropMetadata, slyceId: drop.slyceId, tokenMetadata:drop.tokenMetadata, tierAvailable: drop.tierAvailable, amountTier: drop.amountTier});
+
+      }
     }
   },
   data() {

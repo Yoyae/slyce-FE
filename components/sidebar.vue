@@ -22,6 +22,15 @@
           </li>
         </router-link>
 
+        <router-link v-if="isUserConnected" to="/adddrop" style="text-decoration: none">
+          <li class="nav-item">
+            <a class="nav-link" :class="{active:this.$route.name === 'addDrop'}" href="/adddrop">
+              <span data-feather="file"></span>
+              Add Drop
+            </a>
+          </li>
+        </router-link>
+
         <router-link v-if="isUserConnected" to="/royalties" style="text-decoration: none">
           <li class="nav-item">
             <a class="nav-link" :class="{active:this.$route.name === 'royalties'}" href="/royalties">
@@ -31,11 +40,11 @@
           </li>
         </router-link>
 
-        <router-link v-if="isUserConnected" to="/adddrop" style="text-decoration: none">
+        <router-link v-if="isUserConnected" to="/manageDrop" style="text-decoration: none">
           <li class="nav-item">
-            <a class="nav-link" :class="{active:this.$route.name === 'addDrop'}" href="/adddrop">
+            <a class="nav-link" :class="{active:this.$route.name === 'manageDrop'}" href="/manageDrop">
               <span data-feather="file"></span>
-              Add Drop
+              Buy/Manage drops
             </a>
           </li>
         </router-link>

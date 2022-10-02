@@ -7,128 +7,162 @@
     <form @submit.prevent="addNewDropSubmit">
       <div class="container">
         <div class="row card mb-2">
-          <div class="card-body mb-1">
-            <label class="form-label">Artist address</label>
-            <input ref="artistAddressField" v-model="artistAddress" type="address" class="form-control"
-              v-on:change="validateArtistAddress()" required>
-          </div>
-        </div>
-        <div class="row card mb-2">
-          <div class="card-body mb-1">
-            <label class="form-label">Payment address</label>
-            <input ref="paymentAddressField" v-model="paymentAddress" type="address" class="form-control"
-              v-on:change="validatePaymentAddress()" required> 
-          </div>
-        </div>
-
-        <div class="row card mb-2">
-          <div class="card-body mb-1">
-            <label class="form-label">Drop Id (<a
-                href="https://docs.google.com/spreadsheets/d/1Pv1C5CTm2I1PN3xYx8gWiLIKt6VR6I6dsdIECV_Josg" target="_blank">tool</a>)</label>
-            <input ref="dropIdField" v-model="dropId" type="text" class="form-control" v-on:change="validateDropId()"
-              required>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col card">
             <div class="card-body mb-1">
-              <label class="form-label">Number of tier to sell</label>
-              <div class="previous" v-for="(numberTier, id) in numberTierId" v-bind:key="id">
-                <input ref="amountTierIdField" v-model="numberTierId[id]" type="number" class="form-control" v-on:change="validateAmountTier(id)"
-                  required>
+              <label class="form-label">STEP ONE - INIT DROP</label>
+
+              <div class="container">
+                <div class="row card mb-2">
+                  <div class="card-body mb-1">
+                    <label class="form-label">Artist address</label>
+                    <input ref="artistAddressField" v-model="artistAddress" type="address" class="form-control"
+                      v-on:change="validateArtistAddress()" required>
+                  </div>
+                </div>
+                <div class="row card mb-2">
+                  <div class="card-body mb-1">
+                    <label class="form-label">Payment address</label>
+                    <input ref="paymentAddressField" v-model="paymentAddress" type="address" class="form-control"
+                      v-on:change="validatePaymentAddress()" required> 
+                  </div>
+                </div>
+
+                <div class="row card mb-2">
+                  <div class="card-body mb-1">
+                    <label class="form-label">Drop Id (<a
+                        href="https://docs.google.com/spreadsheets/d/1Pv1C5CTm2I1PN3xYx8gWiLIKt6VR6I6dsdIECV_Josg" target="_blank">tool</a>)</label>
+                    <input ref="dropIdField" v-model="dropId" type="text" class="form-control" v-on:change="validateDropId()"
+                      required>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col card">
+                    <div class="card-body mb-1">
+                      <label class="form-label">Number of tier to sell</label>
+                      <div class="previous" v-for="(numberTier, id) in numberTierId" v-bind:key="id">
+                        <input ref="amountTierIdField" v-model="numberTierId[id]" type="number" class="form-control" v-on:change="validateAmountTier(id)"
+                          required>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col card">
+                    <div class="card-body mb-1">
+                      <label class="form-label">Tier price (in USDC)</label>
+                      <div class="previous" v-for="(price, id) in priceId" v-bind:key="id">
+                        <input ref="tierPriceInUSDCField" v-model="priceId[id]" type="number" class="form-control" v-on:change="validateTierPrice(id)"
+                          required>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col card">
+                    <div class="card-body mb-1">
+                      <label class="form-label">Market royalties (in %, 10% => 10)</label>
+                      <div class="previous" v-for="(marketRoyalties, id) in marketRoyaltiesId" v-bind:key="id">
+                        <input ref="marketRoyaltyTierIdField" v-model="marketRoyaltiesId[id]" type="number" 
+                          class="form-control" v-on:change="validateMarketRoyalties(id)" required>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row justify-content-end mb-2" >
+                  <div class="col-md-auto gx-0">
+                    <button type="button" class="btn btn-success" @click="addAmountTier">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        class="bi bi-plus-circle" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                        <path
+                          d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="col-md-auto gx-0">
+                    <button type="button" class="btn btn-danger" @click="deleteAmountTier">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        class="bi bi-dash-circle" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                        <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="row card mb-2">
+                  <div class="card-body mb-1">
+                    <label class="form-label">Token metadata URL (eg. "https://metadata.royal.io/tierid/xxxxx/")</label>
+                    <input ref="tokenURIField" v-model="tokenURI" type="url" class="form-control"
+                      required>
+                  </div>
+                </div>
+
+                <div class="row card mb-2">
+                  <div class="card-body mb-1">
+                    <label class="form-label">Contract metadata URL (eg. "https://metadata.royal.io/dropid/xxxx.json")</label>
+                    <input ref="contractURIField" v-model="contractURI" type="url" class="form-control"
+                      required>
+                  </div>
+                </div>
+
+                <div class="row mb-2 align-items-center" >
+                  <div class="col-md-auto">
+                    <button type="submit" class="btn btn-primary mt-2">Add drop !</button>
+                  </div>
+                  <div class="col-md-auto">
+                    <button type="button" class="btn btn-primary mt-2" @click="clearValue">Clear values</button>
+                  </div>
+                  <div class="col-md-auto">
+                    <button type="button" class="btn btn-primary mt-2" @click="dummyValues">Dummy values</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col card">
-            <div class="card-body mb-1">
-              <label class="form-label">Tier price (in USDC)</label>
-              <div class="previous" v-for="(price, id) in priceId" v-bind:key="id">
-                <input ref="tierPriceInUSDCField" v-model="priceId[id]" type="number" class="form-control" v-on:change="validateTierPrice(id)"
-                  required>
-              </div>
-            </div>
-          </div>
-          <div class="col card">
-            <div class="card-body mb-1">
-              <label class="form-label">Market royalties (in %, 10% => 10)</label>
-              <div class="previous" v-for="(marketRoyalties, id) in marketRoyaltiesId" v-bind:key="id">
-                <input ref="marketRoyaltyTierIdField" v-model="marketRoyaltiesId[id]" type="number" 
-                  class="form-control" v-on:change="validateMarketRoyalties(id)" required>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="row justify-content-end mb-2" >
-          <div class="col-md-auto gx-0">
-            <button type="button" class="btn btn-success" @click="addAmountTier">
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                class="bi bi-plus-circle" viewBox="0 0 16 16">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                <path
-                  d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
-              </svg>
-            </button>
-          </div>
-          <div class="col-md-auto gx-0">
-            <button type="button" class="btn btn-danger" @click="deleteAmountTier">
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                class="bi bi-dash-circle" viewBox="0 0 16 16">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="row card mb-2">
-          <div class="card-body mb-1">
-            <label class="form-label">Token metadata URL (eg. "https://metadata.royal.io/tierid/xxxxx/")</label>
-            <input ref="tokenURIField" v-model="tokenURI" type="url" class="form-control"
-              required>
-          </div>
-        </div>
-
-        <div class="row card mb-2">
-          <div class="card-body mb-1">
-            <label class="form-label">Contract metadata URL (eg. "https://metadata.royal.io/dropid/xxxx.json")</label>
-            <input ref="contractURIField" v-model="contractURI" type="url" class="form-control"
-              required>
-          </div>
-        </div>
-
-        <div class="row mb-2 align-items-center" >
-          <div class="col-md-auto">
-            <button type="submit" class="btn btn-primary mt-2" :disabled="!addDropdStateOne">Add drop !</button>
-          </div>
-          <div class="col-md-auto">
-            <button type="button" class="btn btn-primary mt-2" @click="clearValue" :disabled="!addDropdStateOne">Clear values</button>
-          </div>
-          <div class="col-md-auto">
-            <button type="button" class="btn btn-primary mt-2" @click="dummyValues" :disabled="!addDropdStateOne">Dummy values</button>
-          </div>
-        </div>
       </div>
     </form>
 
     <form @submit.prevent="ProcessDropInitSubmit">
       <div class="container">
-        <div class="row card mt-2 ">
-          <div class="card-body mb-1" >
-            <label class="form-label" >Token Address</label>
-            <input ref="dropAddressField" v-model="dropAddress" type="text" class="form-control" v-on:change="validateDropAddress()"
-              required :disabled="addDropdStateOne">
+        <div class="row card mb-2">
+            <div class="card-body mb-1">
+              <label class="form-label">STEP TWO - MINT DROP</label>
+              <div class="container">
+                <div class="row card mt-2 ">
+                  <div class="card-body mb-1" >
+                    <label class="form-label" >Token Address</label>
+                    <input ref="dropAddressField" v-model="dropAddress" type="text" class="form-control" v-on:change="validateDropAddress()" required>
+                  </div>
+                </div>
+                <div class="row align-items-center" >
+                  <div class="col-md-auto">
+                    <button type="submit" class="btn btn-primary mt-2" id="buttonProcessDropInit">Process drop intialisation</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="row align-items-center" >
-          <div class="col-md-auto">
-            <button type="submit" class="btn btn-primary mt-2" id="buttonProcessDropInit" :disabled="addDropdStateOne">Process drop intialisation</button>
-          </div>
-          <div class="col-md-auto" v-if="!addDropdStateOne">
-            <label class="form-label mt-2" for="buttonProcessDropInit">init state : {{step}}/{{allSteps}}</label>
-          </div>
-          
+    </form>
+
+    <form @submit.prevent="ChangeToBuyState">
+      <div class="container">
+        <div class="row card mb-2">
+            <div class="card-body mb-1">
+              <label class="form-label">STEP THREE - CHANGE TOKEN DROP TO BUY STATE</label>  
+
+              <div class="container">
+                <div class="row card mt-2 ">
+                  <div class="card-body mb-1" >
+                    <label class="form-label" >Token Address</label>
+                    <input ref="dropStateAddressField" v-model="dropStateAddress" type="text" class="form-control" v-on:change="validateDropStateAddress()" required>
+                  </div>
+                </div>
+                <div class="row align-items-center" >
+                  <div class="col-md-auto">
+                    <button type="submit" class="btn btn-primary mt-2" id="buttonChangeToBuyState">Process state change</button>
+                  </div>                  
+                </div>
+              </div>
+            </div>
         </div>
       </div>
     </form>
@@ -164,7 +198,6 @@ export default {
   data() {
     return {
       contract: null,
-      addDropdStateOne: true,
       artistAddress: null,
       paymentAddress: null,
       dropId: null,
@@ -174,8 +207,7 @@ export default {
       tokenURI: '',
       contractURI: '',
       dropAddress: null,
-      step: 0,
-      allSteps: null
+      dropStateAddress: null,
     }
   },
   methods: {
@@ -286,6 +318,9 @@ export default {
 
     async addNewDropSubmit() {
       var isDataNotValid = false;
+      if(this.numberTierId.length == 0){
+        isDataNotValid = true;
+      }
       this.numberTierId.forEach((item, index) => {
         if(!(this.validateAmountTier(index) && this.validateTierPrice(index) && this.validateMarketRoyalties(index))){
           isDataNotValid = true;
@@ -298,33 +333,15 @@ export default {
 
 
       if(isDataNotValid){
-        this.$toasted.show('One or more input are wrong. Correct red field to proceed.', {
-          type: 'error',
-          duration: 5000,
-          theme: "bubble",
-          position: "top-center"
-        });
+        console.log("STEP 1 : Data is not valid");
       } else {
-        console.log("Data is valid");
+        console.log("STEP 1 : Data is valid");
         
-        await this.contract.addNewDrop(this.artistAddress, this.paymentAddress, this.dropId, this.numberTierId, this.priceId, this.tokenURI, this.contractURI);
-        this.addDropdStateOne = false;
-
-        //Set newly created dropAddress
-        let eventFilter = this.contract.filters.DropCreated();
-        let events = await this.contract.queryFilter(eventFilter);
-        this.dropAddress = events[events.length-1].args.dropAddress;
-        console.log("new drop address : "+this.dropAddress);
-        
-        this.step = 0;
-        this.allSteps = 0;
-        //Set steps to make to init
-        this.numberTierId.forEach((num) => {
-          this.allSteps+=Math.ceil(num / 40);
+        await this.contract.addNewDrop(this.artistAddress, this.paymentAddress, this.dropId, this.numberTierId, this.priceId, this.tokenURI, this.contractURI);        
+        this.getSlyceDropLogicContract.once("DropCreated", async (artistAdr, dropAddress) => {
+            console.log("new drop at " + dropAddress);
+            this.dropAddress = dropAddress;
         });
-        console.log("Steps to process drop : "+this.allSteps);
-
-        
       }
     },
 
@@ -339,24 +356,52 @@ export default {
     },
 
     async ProcessDropInitSubmit() {
-
-      this.getSlyceDropLogicContract.on("DropMinted", async (dropAddress) => {
-        if(dropAddress == this.dropAddress){
-          console.log("new step emitted");
-        }
-      });
-      for (let i = this.step; i < this.allSteps; i++) {
-        var tx = await this.contract.processDropInitialisation(this.dropAddress, this.marketRoyaltiesId);
-        if(tx != 0){
-          this.step++;
-        }
+      var isDataNotValid = false;
+      if(this.numberTierId.length == 0){
+        isDataNotValid = true;
       }
+      this.numberTierId.forEach((item, index) => {
+        if(!(this.validateMarketRoyalties(index))){
+          isDataNotValid = true;
+        }
+      })
+      if (!(this.validateDropAddress())) {
+        isDataNotValid = true;
+      } 
 
-      if(this.step == this.allSteps){
-        this.addDropdStateOne = true;
+      if(isDataNotValid){
+        console.log("STEP 2 : Data is not valid");
+      } else {
+        console.log("STEP 2 : Data is valid");
+        this.getSlyceDropLogicContract.once("DropMinted", async (dropAddress) => {
+          if(dropAddress == this.dropAddress){
+            console.log("mint is over for " + dropAddress);
+            this.dropStateAddress = dropAddress;
+            this.dropAddress = null;
+          }
+        });
+        await this.contract.processDropInitialisation(this.dropAddress, this.marketRoyaltiesId);
       }
+    },
 
-    }
+    validateDropStateAddress() {
+      if (!ethers.utils.isAddress(this.dropStateAddress)) {
+        this.$refs.dropStateAddressField.style.borderColor = "red";
+        return false;
+      } else {
+        this.$refs.dropStateAddressField.style.borderColor = "green";
+        return true;
+      }
+    },
+
+    async ChangeToBuyState() {
+      if (this.validateDropStateAddress()) {
+        console.log("STEP 3 : Data is valid");
+        await this.contract.changeDropToStatePurchase(this.dropStateAddress);
+      }
+    },
+
+
   }
 }
 </script>

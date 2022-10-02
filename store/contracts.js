@@ -137,10 +137,10 @@ const actions = {
     let tokenContract;
 
     let dropCreatedEventFilter = getters.getSlyceDropLogicContract.filters.DropCreated();
-    let dropCreatedEvents = await getters.getSlyceDropLogicContract.queryFilter(dropCreatedEventFilter);
+    let dropCreatedEvents = await getters.getSlyceDropLogicContract.queryFilter(dropCreatedEventFilter, 28302992);
 
     let dropMintedEventFilter = getters.getSlyceDropLogicContract.filters.DropMinted();
-    let dropMintedEvents = await getters.getSlyceDropLogicContract.queryFilter(dropMintedEventFilter);
+    let dropMintedEvents = await getters.getSlyceDropLogicContract.queryFilter(dropMintedEventFilter, 28302992);
 
     let dropMintedEvent = null;
 
