@@ -9,7 +9,7 @@
     "type": "album",
     "blockchain": "ETH",
     "token": "123",
-	"contract" : "0x73506493b72E6E2AF18Bd3Af5c76E2D165F7aFcB",
+	"contract" : "0xE871D09248f1B9b5d772D700ae9d2C0134F07f15",
     "medias": {
         "cover": "kid-cudi-man-on-the-moon-3-teaser_1290_758-1.jpg",
         "video": {
@@ -29,12 +29,12 @@
     "tiers": [
         {
             "type": "Gold",
-            "tokens": "1000",
-            "price": "99",
+            "tokensAmount": "10",
+            "price": "1",
             "percent": "0.005",
             "image": "Slyce-Favicons-3.png",
             "id": "0",
-			"availableAmount" : "999",
+			"availableAmount" : "8",
             "benefits": [
                 "Private community access",
                 "Exclusivity on next release"
@@ -42,12 +42,12 @@
         },
         {
             "type": "Platinium",
-            "tokens": "100",
-            "price": "499",
+            "tokensAmount": "5",
+            "price": "2",
             "percent": "0.050",
             "image": "Slyce-Favicons-1-1.png",
             "id": "1",
-			"availableAmount" : "99",
+			"availableAmount" : "0",
             "benefits": [
                 "Private community access",
                 "Exclusivity on next release",
@@ -56,12 +56,12 @@
         },
         {
             "type": "Diamond",
-            "tokens": "10",
-            "price": "999",
+            "tokensAmount": "1",
+            "price": "3",
             "percent": "0.500",
             "image": "Slyce-Favicons-2-1.png",
             "id": "2",
-			"availableAmount" : "9",
+			"availableAmount" : "0",
             "benefits": [
                 "Private community access",
                 "Exclusivity on next release",

@@ -7,8 +7,14 @@
 				<img class="header-logo" src="~/assets/img/slyce-logo.png"/>
 				<span class="header-version">Beta</span>
 			</div>
-			<div>
+			<div v-if="!isUserConnected">
 				<button class="btn btn--s btn--outline" type="button" @click="connectWeb3Modal">Connect your wallet</button>
+			</div>
+			<div v-if="isUserConnected">
+				<span class="navbar-text">
+					{{getActiveAccount}}
+				</span>
+				<button class="btn btn-outline-danger" type="button"  @click="disconnectWeb3Modal">Disconnect</button>
 			</div>
 		</header>
 
@@ -17,19 +23,6 @@
 			
 			<!-- Blocs -->
 			<div class="flex-1">
-				<!-- <ul class="navbar-nav mr-auto px-3">
-					<li class="nav-item text-nowrap" v-if="!isUserConnected">
-						<button class="btn btn-outline-primary" type="button" @click="connectWeb3Modal">Connect your wallet</button>
-						
-					</li>
-					<li class="nav-item text-nowrap" v-if="isUserConnected">
-						<span class="navbar-text">
-						{{getActiveAccount}}
-						</span>
-						<button class="btn btn-outline-danger" type="button"  @click="disconnectWeb3Modal">Disconnect</button>
-					</li>
-				</ul> -->
-				
 				<div class="card-blur">
 					<h1 class="title title--overlay">{{ config.name }}</h1>
 
@@ -68,7 +61,7 @@
 							<img class="card-nft-small__image" :src="getFullURL(tier.image)" alt="">
 	
 							<div class="card-nft-small__title">{{ tier.type }}</div>
-							<div>{{ tier.tokens }} tokens</div>
+							<div>{{ tier.tokensAmount }} tokens</div>
 							<div>${{ tier.price }}</div>
 	
 						</div>
@@ -194,7 +187,7 @@
 						<div class="mb-2">
 							<button class="btn btn--cta" @click="participate(tier)">Participate</button>
 						</div>
-						<div>{{ getTokenLeft(tier) }} / {{ tier.tokens }} tokens left</div>
+						<div>{{ getTokenLeft(tier) }} / {{ tier.tokensAmount }} tokens left</div>
 	
 					</div>
 	
@@ -318,6 +311,12 @@
 					<div class="flex-1"></div>
 				</div>
 
+				<div class="flex">
+					<label fpr="selectedAmountLabel" class="card-nft-mini mt-2">Number of Slyce</label>
+                    <input id="selectedAmountLabel" v-model="selectedAmount" type="number" class="form-control text-right" placeholder="1"
+					required> 
+				</div>
+
 				<div class="p-4 flex justify-between">
 					<button class="btn btn--light" @click="cancel">Cancel</button>
 					<button class="btn" @click="confirm">Confirm</button>
@@ -376,6 +375,7 @@ export default {
 			tiers: [],
 
 			selectedTier: null,
+			selectedAmount: null,
 
             showVideoModal: false,
 			showConfirmationPopup: false,
@@ -564,21 +564,29 @@ export default {
 					this.showTransactionPopup = false;
 					this.alertWarning = "No wallet connected";
 				}, 500)
+			} else if(parseInt(this.selectedAmount) > this.tiers[this.selectedTier.id]) {
+				// TODO : gestion de l'erreur
+				setTimeout(() => {
+					this.showTransactionPopup = false;
+					this.alertWarning = "Invalid Amount";
+				}, 500)
 			} else {
 				let buyContract = new ethers.Contract(this.getSlyceDropBuyAddress, this.getSlyceDropBuyAbi, this.getProviderEthers.getSigner());
+		
+				let approveABI = ["function approve(address _spender, uint256 _value) public returns (bool success)"]
+      			let usdcContract = new ethers.Contract(await buyContract.usdcContract(), approveABI, this.getProviderEthers.getSigner());
 
-				//HUGO -> Rempalcer tierIdToPurshase et numberOfTierToPurshase par les bonnes variables.
-				// tierIdToPurshase -> l'ID du tier qu'il achète (ex : GOLD : 0)
-				// numberOfTierToPurshase -> le montant qu'il achète (ça doit être un champ nombre présent juste avant le "Confirm")
-				let purshaseResult = await buyContract.purchaseDrop(this.config.contract, tierIdToPurshase, numberOfTierToPurshase);
-				//purshaseResult contient le tx si la transaction a été envoyé, sinon le message d'erreur
+				await usdcContract.approve(this.getSlyceDropBuyAddress, (this.selectedTier.price * parseInt(this.selectedAmount) /* * Math.pow(10,18) */).toString() );
+
+				let purshaseResult = await buyContract.purchaseDrop(this.config.contract, this.selectedTier.id, parseInt(this.selectedAmount));
+				// purshaseResult contient le tx si la transaction a été envoyé, sinon le message d'erreur
+				// TODO : faire les slides d'après (attente confirmation into confirmation de l'achat)
 
 				setTimeout(() => {
 					this.showTransactionPopup = false;
 					this.alertSuccess = "Congratulation ! You're Slyce is now in you wallet.";
 				}, 3000)
 			}
-
 		}
     }
 }
