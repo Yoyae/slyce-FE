@@ -31,9 +31,9 @@ export default {
   computed: {
     ...mapGetters("accounts", ["getActiveAccount", "isUserConnected", "getWeb3Modal"]),
   },
-  created() {
-    this.$store.dispatch("accounts/initWeb3Modal",);
-    this.$store.dispatch("accounts/ethereumListener");
+  async created() {
+    await this.$store.dispatch("accounts/initWeb3Modal",);
+    await this.$store.dispatch("accounts/ethereumListener");
   },
   methods: {
     ...mapActions("accounts", ["connectWeb3Modal", "disconnectWeb3Modal"]),

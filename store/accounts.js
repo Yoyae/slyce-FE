@@ -74,7 +74,7 @@ const actions = {
 
       commit("setActiveAccount", window.ethereum.selectedAddress);
       commit("setChainData", window.ethereum.chainId);
-      commit("setEthersProvider", providerW3m); // BUG: problème au niveau de la mutation de l'objet passé en paramètre
+      commit("setEthersProvider", providerW3m);
       actions.fetchActiveBalance({ commit, getters });
     }
 
@@ -82,7 +82,6 @@ const actions = {
   },
 
   async connectWeb3Modal({ commit, getters }) {
-    //let providerW3m = await state.web3Modal.connect();
     let providerW3m = await getters.getWeb3Modal.connect();
     commit("setIsConnected", true);
 
@@ -133,8 +132,6 @@ const mutations = {
     }
     state.providerW3m = null;
     await state.web3Modal.clearCachedProvider();
-
-    window.location.href = '../'; // redirect to the Main page
   },
 
   setActiveAccount(state, selectedAddress) {

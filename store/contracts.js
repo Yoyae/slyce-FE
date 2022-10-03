@@ -7,7 +7,7 @@ import addresses from "@/static/contracts/addresses.json";
 
 const state = function() {
   return {
-    num: 0,
+    slyceVersion: 0,
     slyceDropLogicContract: null,
     slyceDropLogicAbi:null,
     slyceDropLogicAddress:null,
@@ -30,6 +30,10 @@ const state = function() {
 };
 
 const getters = {
+  //Version
+  getSlyceVersion(state) {
+    return state.slyceVersion;
+  },
   //DropLogic
   getSlyceDropLogicContract(state) {
     return state.slyceDropLogicContract;
@@ -71,6 +75,21 @@ const getters = {
 };
 
 const actions = {
+  async storeSlyceVersion({commit, rootState}) {
+    let provider = rootState.accounts.providerEthers;
+    let chainIdDec = parseInt(rootState.accounts.chainId);
+    let slyceDropLogicAddress = addresses.SlyceDropLogic[chainIdDec];
+
+    console.log(provider);
+    console.log(chainIdDec);
+    console.log(slyceDropLogicAddress);
+
+    let contract = new ethers.Contract(slyceDropLogicAddress, SlyceDropLogic.abi, provider);
+    let getVersion = await contract.getVersion();
+    let version = getVersion[0] + "." + getVersion[1];
+    console.log(version);
+    commit("setSlyceVersion", version);
+  },
   //SlyceDropLogic
   storeSlyceDropLogicContract({commit, rootState}) {
     let provider = rootState.accounts.providerEthers;
@@ -213,6 +232,9 @@ const actions = {
 };
 
 const mutations = {
+  setSlyceVersion(state, version) {
+    state.slyceVersion = version;
+  },
   // SlyceDropLogic
   setSlyceDropLogicContract(state, contract) {
     state.slyceDropLogicContract = contract;

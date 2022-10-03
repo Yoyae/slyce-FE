@@ -80,7 +80,6 @@ export default {
   name: "sidebar",
   computed: {
     ...mapGetters("accounts", ["getChainName", "isUserConnected", "getWeb3Modal"]),
-
     showChainAlert() {
       switch (this.getChainName) {
         case "Mainnet":

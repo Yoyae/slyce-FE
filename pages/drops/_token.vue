@@ -7,8 +7,14 @@
 				<img class="header-logo" src="~/assets/img/slyce-logo.png"/>
 				<span class="header-version">Beta</span>
 			</div>
-			<div>
+			<div v-if="!isUserConnected">
 				<button class="btn btn--s btn--outline" type="button" @click="connectWeb3Modal">Connect your wallet</button>
+			</div>
+			<div v-if="isUserConnected">
+				<span class="navbar-text">
+					{{getActiveAccount}}
+				</span>
+				<button class="btn btn-outline-danger" type="button"  @click="disconnectWeb3Modal">Disconnect</button>
 			</div>
 		</header>
 
@@ -462,7 +468,9 @@ export default {
         }
     },
     async created() {
-        this.dropToken = this.$route?.params?.token;
+        // this.dropToken = this.$route?.params?.token;
+		let URLParams = new URLSearchParams(window.location.search);
+		this.dropToken = URLParams.get('ref');
 
         if(!this.dropToken)
             return this.redirectHomepage();

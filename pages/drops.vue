@@ -311,7 +311,7 @@
 
 				<div class="flex">
 					<label fpr="selectedAmountLabel" class="card-nft-mini mt-2">Number of Slyce</label>
-                    <input id="selectedAmountLabel" v-model="selectedAmount" type="number" class="form-control text-right" placeholder="1"
+                    <input id="selectedAmountLabel" v-model="selectedAmount" type="number" class="form-control text-right"
 					required> 
 				</div>
 
@@ -373,7 +373,7 @@ export default {
 			tiers: [],
 
 			selectedTier: null,
-			selectedAmount: null,
+			selectedAmount: 1,
 
             showVideoModal: false,
 			showConfirmationPopup: false,
@@ -563,7 +563,7 @@ export default {
 					this.alertWarning = "No wallet connected";
 				}, 500)
 			} else if(parseInt(this.selectedAmount) > this.tiers[this.selectedTier.id]) {
-				// TODO : gestion de l'erreur
+				// TODO François : gestion de l'erreur
 				setTimeout(() => {
 					this.showTransactionPopup = false;
 					this.alertWarning = "Invalid Amount";
