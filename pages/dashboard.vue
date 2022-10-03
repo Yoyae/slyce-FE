@@ -63,6 +63,9 @@ export default {
   async created() {
     // if web3 provider has not been yet loaded, redirect to root 
     if (!this.getProviderEthers) {
+      await this.$store.dispatch("accounts/initWeb3Modal");
+    }
+    if (!this.getProviderEthers) {
       document.location.href="/";
       return;
     } else {

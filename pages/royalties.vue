@@ -74,7 +74,10 @@ export default {
     ...mapGetters("accounts", ["getActiveAccount", "getProviderEthers"]),
     ...mapGetters("contracts", ["getSlyceRoyaltiesContract", "getSlyceRoyaltiesAbi", "getSlyceRoyaltiesAddress"])
   },
-  created() {
+  async created() {
+    if (!this.getProviderEthers) {
+      await this.$store.dispatch("accounts/initWeb3Modal");
+    }
     // if web3 provider has not been yet loaded, redirect to root 
     if (!this.getProviderEthers) {
       document.location.href = "/";

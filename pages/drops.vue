@@ -11,9 +11,7 @@
 				<button class="btn btn--s btn--outline" type="button" @click="connectWeb3Modal">Connect your wallet</button>
 			</div>
 			<div v-if="isUserConnected">
-				<span class="navbar-text">
-					{{getActiveAccount}}
-				</span>
+				<button class="btn btn-outline-danger" type="button">{{getActiveAccount.slice(0,5)}}...{{getActiveAccount.slice(getActiveAccount.length - 5)}}</button>
 				<button class="btn btn-outline-danger" type="button"  @click="disconnectWeb3Modal">Disconnect</button>
 			</div>
 		</header>
@@ -575,12 +573,16 @@ export default {
 		
 				let approveABI = ["function approve(address _spender, uint256 _value) public returns (bool success)"]
       			let usdcContract = new ethers.Contract(await buyContract.usdcContract(), approveABI, this.getProviderEthers.getSigner());
+				let price = (this.selectedTier.price * parseInt(this.selectedAmount) /* * Math.pow(10,18) */).toString();
+				//Partie 1
+				await usdcContract.approve(this.getSlyceDropBuyAddress,  price);
 
-				await usdcContract.approve(this.getSlyceDropBuyAddress, (this.selectedTier.price * parseInt(this.selectedAmount) /* * Math.pow(10,18) */).toString() );
-
+				//Partie 2
 				let purshaseResult = await buyContract.purchaseDrop(this.config.contract, this.selectedTier.id, parseInt(this.selectedAmount));
 				// purshaseResult contient le tx si la transaction a été envoyé, sinon le message d'erreur
 				// TODO : faire les slides d'après (attente confirmation into confirmation de l'achat)
+				
+
 
 				setTimeout(() => {
 					this.showTransactionPopup = false;

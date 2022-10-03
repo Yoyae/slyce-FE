@@ -8,7 +8,9 @@
     <p>(Obviously only admin will be allowed to modify values in contract)</p>
 
     <p v-if="isUserConnected">
-      <strong>Your current chain:</strong> {{getChainName}}
+      <div><strong>Your current chain:</strong> {{getChainName}}</div>
+      <div>using Slyce contract {{getSlyceDropLogicAddress}},</div>
+      <div>version {{getSlyceVersion}}</div>
     </p>
 
   </div>
@@ -20,7 +22,17 @@ export default {
   name: "Homepage",
   layout: 'dashboard',
   computed: {
-    ...mapGetters("accounts", ["getChainName", "isUserConnected"]),
+    ...mapGetters("accounts", ["getChainName", "isUserConnected", "getProviderEthers"]),
+    ...mapGetters("contracts", ["getSlyceVersion", "getSlyceDropLogicAddress"]),
+  },
+  async created() {
+    if (!this.getProviderEthers) {
+      await this.$store.dispatch("accounts/initWeb3Modal");
+    }
+    if (this.getProviderEthers) {
+      this.$store.dispatch("contracts/storeSlyceDropLogicAddress");
+      this.$store.dispatch("contracts/storeSlyceVersion");
+    }
   },
 }
 </script>
