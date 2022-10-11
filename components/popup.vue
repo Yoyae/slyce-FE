@@ -82,7 +82,7 @@ export default {
         background: #fff;
         padding: 1rem;
         margin: 2rem;
-        max-width: 600px;
+        /* max-width: 600px; */
         border-radius: 1rem;
     }
     .popup-inner--warning {

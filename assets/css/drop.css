@@ -248,7 +248,8 @@ html {
 }
 
 .card-nft-mini {
-    padding: 0.7rem;
+    display: inline-block;
+    padding: .3rem .7rem .1rem .7rem;
     background: #000;
     border-radius: 8px;
     color: #fff;
@@ -463,7 +464,10 @@ html {
     cursor: pointer;
     transition: all .3s;
 }
-.btn:hover {
+.btn[disabled] {
+    opacity: .5;
+}
+.btn:hover:not([disabled]) {
     /* background-color: #ddd;
     color: #000; */
     color: var( --e-global-color-primary );
@@ -474,9 +478,13 @@ html {
     /* background-color: #aaa; */
 }
 
-.btn--light {
+.btn--light,
+.btn--clear {
     background-color: #fff;
     color: var( --e-global-color-primary );
+}
+.btn--clear {
+    border-color: #fff;
 }
 .btn--s {
     padding: .5rem 1rem;
@@ -511,5 +519,8 @@ html {
 .separator {
     display: inline-block;
     width: 35%;
+    border-color: var( --e-global-color-8d7c031 );
+}
+hr {
     border-color: var( --e-global-color-8d7c031 );
 }

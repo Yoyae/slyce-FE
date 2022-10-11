@@ -287,40 +287,210 @@
 		</div>
 
 		<!-- Popups -->
+		<Popup :type="'error'" :title="alertError" v-if="alertError" @click.native="alertError = null"></Popup>
 		<Popup :type="'warning'" :title="alertWarning" v-if="alertWarning" @click.native="alertWarning = null"></Popup>
 		<Popup :type="'success'" :title="alertSuccess" v-if="alertSuccess" @click.native="alertSuccess = null"></Popup>
 		<Popup :type="'info'" :title="alertInfo" v-if="alertInfo" @click.native="alertInfo = null"></Popup>
-		<Popup v-if="showConfirmationPopup">
-			<div class="text-center">
-				<div class="pt-8">
-					<i class="fa-solid fa-circle-up" style="font-size: 3rem;"></i>
-				</div>
+
+		<!-- Popup quantity -->
+		<!-- <Popup v-if="showConfirmationPopup"> -->
+		<Popup v-if="popupState == 'confirm-quantity'">
+			<div class="text-center" style="width: 650px;">
 				<div class="p-4">
-					<div class="title title--small">
-						You are going to purchase
+					<div class="title title--small whitespace-nowrap">
+						How many Slyces do you want ?
 					</div>
-					<div class="card-nft-mini mt-2" v-if="selectedTier">
+				</div>
+
+				<hr class="separator">
+
+				<div class="mt-2">
+					<div class="card-nft-mini" v-if="selectedTier">
 						{{ selectedTier.type }}
 					</div>
 				</div>
+				
 				<div class="flex">
 					<div class="flex-1"></div>
-					<div class="flex-1"><hr></div>
+					<div class="flex items-center">
+						<button class="btn btn--clear btn--s" @click="selectedAmount>1?selectedAmount--:null">
+							<i class="fa-solid fa-fw fa-minus"></i>
+						</button>
+						<div style="padding: 1rem 2rem; font-size: 2rem;">
+							{{ selectedAmount }}
+						</div>
+						<!-- <input type="number" v-model="selectedAmount" required style="margin: 0 1rem; padding: .5rem 0 .5rem 1rem; width: 3rem;">  -->
+						<button class="btn btn--clear btn--s" @click="selectedAmount<getTokenLeft(tier)?selectedAmount++:null">
+							<i class="fa-solid fa-fw fa-plus"></i>
+						</button>
+					</div>
 					<div class="flex-1"></div>
 				</div>
 
-				<div class="flex">
-					<label fpr="selectedAmountLabel" class="card-nft-mini mt-2">Number of Slyce</label>
-                    <input id="selectedAmountLabel" v-model="selectedAmount" type="number" class="form-control text-right"
-					required> 
+				<div class="text-center">
+					Max : {{ getTokenLeft(tier) }}
 				</div>
+
+				<hr class="separator">
 
 				<div class="p-4 flex justify-between">
 					<button class="btn btn--light" @click="cancel">Cancel</button>
-					<button class="btn" @click="confirm">Confirm</button>
+					<button class="btn" @click="confirm">Next</button>
 				</div>
 			</div>
 		</Popup>
+
+		<!-- Popup payment method -->
+		<!-- <Popup v-if="showConfirmationPopup"> -->
+		<Popup v-if="popupState == 'payment-method'">
+			<div class="text-center" style="width: 650px;">
+				<div class="p-4">
+					<div class="title title--small whitespace-nowrap">
+						Payment method
+					</div>
+				</div>
+
+				<hr class="separator">
+
+				<div class="p-2">
+					Select a prefered payment method
+				</div>
+
+				<div class="p-2">
+					<button class="btn w-full" @click="pay('card')">
+						Card
+					</button>
+				</div>
+
+				<div class="p-2">
+					<button class="btn w-full" @click="pay('crypto')">
+						Crypto
+					</button>
+				</div>
+
+				<div class="p-2">
+					By making a selection, you agree to the Therms of Service and acknowledge that purchases are final and non-refundable
+				</div>
+
+				<hr class="separator">
+
+				<div class="p-4">
+					<button class="btn btn--light" @click="cancel">Cancel</button>
+					<!-- <button class="btn" @click="confirm">Confirm</button> -->
+				</div>
+			</div>
+		</Popup>
+
+		<!-- Popup payment method -->
+		<Popup v-if="popupState == 'crypto-transaction'">
+			<div style="width: 1000px;">
+				<div class="flex">
+					<!-- Left -->
+					<div class="flex-1 flex flex-col">
+
+						<div class="flex-1 flex items-center justify-center">
+
+							<div style="width: 300px;">
+								<header class="card-nft-large__header">
+									<img class="card-nft-large__image" :src="getFullURL(selectedTier.image)" alt="">
+									<div class="card-nft-large__title">{{ selectedTier.type }} Slyce</div>
+								</header>
+
+							</div>
+
+						</div>
+
+						<div>
+							<div>
+								<b>{{ config.name }}</b>
+							</div>
+							<div class="flex justify-between">
+								<div>
+									{{ config.artist.name }}
+								</div>
+								<div>
+									{{ selectedTier.type}}
+								</div>
+							</div>
+							<hr/>
+							<div class="flex justify-between">
+								<div>
+									Total
+								</div>
+								<div>
+									{{ selectedAmount }}
+									x
+									{{ selectedTier.price }}
+									=
+									{{ selectedAmount * selectedTier.price }}
+									$
+								</div>
+							</div>
+						</div>
+
+					</div>
+					<!-- Right -->
+					<div class="flex-1 flex items-center justify-center">
+
+						<div class="text-center m-4">
+							<div class="p-4">
+								<div class="title title--small whitespace-nowrap">
+									1. Approuve transaction
+								</div>
+							</div>
+							<div class="p-4">
+								Sign in using you wallet
+							</div>
+							<div class="p-4">
+								<button class="btn" :disabled="transactionState.approuve != 0" @click="approuve">
+									<i class="fa-solid fa-spinner fa-spin mr-2" v-if="transactionState.approuve == 1"></i>
+									<i class="fa-solid fa-check" v-if="transactionState.approuve == 2"></i>
+									<span v-if="transactionState.approuve == -1">Approuve</span>
+									<span v-if="transactionState.approuve == 0">Approuve</span>
+									<span v-if="transactionState.approuve == 1">Approuving</span>
+									<span v-if="transactionState.approuve == 2">Approuved</span>
+								</button>
+							</div>
+							
+							<hr class="separator">
+
+							<div class="p-4">
+								<div class="title title--small whitespace-nowrap">
+									2. Send transaction
+								</div>
+							</div>
+							<div class="p-4">
+								Complet transaction by sending the transaction to the network
+							</div>
+							<div class="p-4">
+								<button class="btn" :disabled="transactionState.send != 0" @click="send">
+									<i class="fa-solid fa-spinner fa-spin mr-2" v-if="transactionState.send == 1"></i>
+									<i class="fa-solid fa-check" v-if="transactionState.send == 2"></i>
+									<span v-if="transactionState.send == -1">Send</span>
+									<span v-if="transactionState.send == 0">Send</span>
+									<span v-if="transactionState.send == 1">Sending</span>
+									<span v-if="transactionState.send == 2">Sent</span>
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="text-center">
+
+					<!-- <hr class="separator"> -->
+					
+					<div class="p-4">
+						<button class="btn btn--light" @click="cancel">Cancel</button>
+						<!-- <button class="btn" @click="f">Confirm</button> -->
+					</div>
+					
+				</div>
+			</div>
+		</Popup>
+
+
 		<Popup v-if="showTransactionPopup">
 			<div class="text-center">
 				<div class="pt-8">
@@ -378,6 +548,12 @@ export default {
             showVideoModal: false,
 			showConfirmationPopup: false,
 			showTransactionPopup: false,
+
+			popupState: null, // confirm-quantity | payment-method | crypto-transaction
+			transactionState: { // -1:disabled | 0: still | 1: running | 2:done
+				approuve: 0,
+				send: -1,
+			},
 
 			alertWarning: null,
 			alertSuccess: null,
@@ -538,6 +714,10 @@ export default {
             return `${this.dropUrl + url}`;
         },
         getTokenLeft(tier) {
+
+			// TODO François récupèrer le nombre de parts restantes via blockchain
+			return 10; // TEST
+
             if(tier)
 				return this.tiers[tier.id];
             else
@@ -545,15 +725,49 @@ export default {
         },
         participate(tier) {
 			this.selectedTier = tier;
-			this.showConfirmationPopup = true;
-
-			console.log(window);
+			this.selectedAmount = 1;
+			this.popupState = 'confirm-quantity';
         },
 		cancel() {
 			this.selectedTier = null;
-			this.showConfirmationPopup = false;
+			this.popupState = null;
 		},
-		async confirm() {
+		confirm() {
+			this.popupState = 'payment-method';
+		},
+		pay(method) {
+			switch(method) {
+				case 'crypto':
+					this.transactionState.approuve = 0;
+					this.transactionState.send = -1;
+					this.popupState = 'crypto-transaction';
+					break;
+				case 'card':
+					// this.popupState = '';
+					// TODO
+					break;
+			}
+		},
+		approuve() {
+			let _this = this;
+			this.transactionState.approuve = 1;
+			setTimeout(() => { // SIMULATION
+				_this.transactionState.approuve = 2;
+				_this.transactionState.send = 0;
+			}, 2000);
+		},
+		send() {
+			let _this = this;
+			this.transactionState.send = 1;
+			setTimeout(() => { // SIMULATION
+				_this.transactionState.send = 2;
+			}, 2000);
+			setTimeout(() => { // SIMULATION
+				_this.popupState = null;
+				_this.alertSuccess = "Congratulation ! You're Slyce is now in you wallet.";
+			}, 4000);
+		},
+		async confirmSAVE() {
 			this.showConfirmationPopup = false;
 			this.showTransactionPopup = true;
 
